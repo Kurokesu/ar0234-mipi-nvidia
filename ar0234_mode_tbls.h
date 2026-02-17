@@ -56,6 +56,13 @@
 #define AR0234_REG_COMPANDING 0x31D0
 #define AR0234_REG_PIX_DEF_ID 0x31E0
 #define AR0234_REG_MIPI_CNTRL 0x3354
+#define AR0234_REG_GRR_CONTROL1 0x30CE
+#define AR0234_REG_LINE_LENGTH_PCK 0x300C
+
+/* RESET_REGISTER (0x301A) values — matches reference NVIDIA AR0234 driver */
+#define AR0234_RESET_REG_STANDBY  0x2058  /* DRIVE_PINS | SMIA_SER_DIS | standby */
+#define AR0234_RESET_REG_STREAM   0x295C  /* + FORCED_PLL_ON | STREAM */
+#define AR0234_RESET_REG_MASK_BAD 0x0200  /* Bit 9: suppress corrupted frames */
 
 #define AR0234_MFR_30BA_GAIN_BITS(_val) (0x7620 | (_val))
 #define AR0234_SERIAL_FORMAT_NUM_LANES(_num_lanes) (0x0200 | (_num_lanes))
@@ -118,6 +125,8 @@ static struct reg_16 ar0234_mode_1920x1200[] = {
 	{ AR0234_REG_X_ADDR_START, 0x0008 },
 	{ AR0234_REG_Y_ADDR_END, 0x04B7 },
 	{ AR0234_REG_X_ADDR_END, 0x0787 },
+	{ AR0234_REG_FRAME_LENGTH_LINES, 0x098D }, /* 2445 = FLL default */
+	{ AR0234_REG_LINE_LENGTH_PCK, 0x0264 },    /* 612 = actual sensor line length */
 	{ AR0234_REG_X_ODD_INC, 0x0001 },
 	{ AR0234_REG_Y_ODD_INC, 0x0001 },
 	{ AR0234_REG_READ_MODE, 0xC000 },

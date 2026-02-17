@@ -591,9 +591,24 @@ static int ar0234_set_mode(struct tegracam_device *tc_dev)
 
 static int ar0234_start_streaming(struct tegracam_device *tc_dev)
 {
+	struct camera_common_data *s_data = tc_dev->s_data;
+	int err;
+
 	dev_dbg(tc_dev->dev, "%s:\n", __func__);
 
-	return ar0234_write_reg_8(tc_dev->s_data, AR0234_REG_MODE_SELECT, 0x01);
+	err = ar0234_write_reg_16(s_data, AR0234_REG_GRR_CONTROL1, 0x0020);
+	if (err)
+		return err;
+
+	err = ar0234_write_reg_16(s_data, AR0234_REG_RESET,
+				  AR0234_RESET_REG_STREAM |
+				  AR0234_RESET_REG_MASK_BAD);
+	if (err)
+		return err;
+
+	msleep(100);
+
+	return 0;
 }
 
 static int ar0234_stop_streaming(struct tegracam_device *tc_dev)
@@ -601,9 +616,15 @@ static int ar0234_stop_streaming(struct tegracam_device *tc_dev)
 	int err;
 
 	dev_dbg(tc_dev->dev, "%s:\n", __func__);
-	err = ar0234_write_reg_8(tc_dev->s_data, AR0234_REG_MODE_SELECT, 0x00);
 
-	return err;
+	err = ar0234_write_reg_16(tc_dev->s_data, AR0234_REG_RESET,
+				  AR0234_RESET_REG_STANDBY);
+	if (err)
+		return err;
+
+	msleep(100);
+
+	return 0;
 }
 
 static struct camera_common_sensor_ops ar0234_common_ops = {
