@@ -26,7 +26,8 @@ DTC_FLAGS := -@ -I dts -O dtb -Wno-unit_address_vs_reg
 # --- L4T version (parsed once, used for header fetch and DTS patching) ---
 L4T_MAJOR := $(shell grep -oP 'R\K[0-9]+' /etc/nv_tegra_release | head -1)
 L4T_MINOR := $(shell grep -oP 'REVISION:\s*\K[0-9]+' /etc/nv_tegra_release | head -1)
-L4T_TAG   := jetson_$(L4T_MAJOR).$(L4T_MINOR)
+L4T_PATCH := $(shell grep -oP 'REVISION:\s*[0-9]+\.\K[0-9]+' /etc/nv_tegra_release | head -1)
+L4T_TAG   := jetson_$(L4T_MAJOR).$(L4T_MINOR)$(if $(L4T_PATCH),.$(L4T_PATCH))
 
 # --- Kernel module ---
 KDIR      := /lib/modules/$(shell uname -r)/build
