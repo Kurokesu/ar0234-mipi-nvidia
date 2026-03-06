@@ -21,6 +21,8 @@ if [ -z "$TAG" ]; then
     L4T_MAJOR=$(grep -oP 'R\K[0-9]+' /etc/nv_tegra_release | head -1)
     L4T_MINOR=$(grep -oP 'REVISION:\s*\K[0-9]+' /etc/nv_tegra_release | head -1)
     L4T_PATCH=$(grep -oP 'REVISION:\s*[0-9]+\.\K[0-9]+' /etc/nv_tegra_release | head -1)
+    # NVIDIA omits .0 patch in GitLab tags (e.g. jetson_36.5, not jetson_36.5.0)
+    if [ "$L4T_PATCH" = "0" ]; then L4T_PATCH=""; fi
     TAG="jetson_${L4T_MAJOR}.${L4T_MINOR}${L4T_PATCH:+.${L4T_PATCH}}"
 fi
 
