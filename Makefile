@@ -61,8 +61,8 @@ $(BUILD_DIR)/$(DTBO): $(DTS) $(DT_HEADER) | $(BUILD_DIR)
 	@echo "  CPP     $<"
 	@$(CPP) $(CPP_FLAGS) -o $(BUILD_DIR)/$(DTS:.dts=.dts.preprocessed) $<
 	@# DTS defaults to 22pin (JetPack 6.2.2+). Patch to 24pin for L4T < 36.5.
-	@if [ "$(L4T_MAJOR)" -lt 36 ] 2>/dev/null || { [ "$(L4T_MAJOR)" -eq 36 ] && [ "$(L4T_MINOR)" -lt 5 ]; }; then \
-		echo "  PATCH   jetson-header-name -> 24pin (L4T $(L4T_MAJOR).$(L4T_MINOR))"; \
+	@if [ $$(($(L4T_MAJOR) * 100 + $(L4T_MINOR))) -lt 3605 ]; then \
+		echo "  PATCH   jetson-header-name -> 24pin ($(L4T_TAG))"; \
 		sed -i 's|Jetson 22pin CSI Connector|Jetson 24pin CSI Connector|' \
 			$(BUILD_DIR)/$(DTS:.dts=.dts.preprocessed); \
 	fi

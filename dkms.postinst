@@ -24,7 +24,7 @@ cpp -nostdinc -undef -D__DTS__ -x assembler-with-cpp \
 L4T_MAJOR=$(grep -oP 'R\K[0-9]+' /etc/nv_tegra_release | head -1)
 L4T_MINOR=$(grep -oP 'REVISION:\s*\K[0-9]+' /etc/nv_tegra_release | head -1)
 
-if [ "$L4T_MAJOR" -lt 36 ] 2>/dev/null || { [ "$L4T_MAJOR" -eq 36 ] && [ "$L4T_MINOR" -lt 5 ]; }; then
+if [ $((L4T_MAJOR * 100 + L4T_MINOR)) -lt 3605 ]; then
     echo "Patching jetson-header-name for L4T ${L4T_MAJOR}.${L4T_MINOR} (24pin)"
     sed -i 's|Jetson 22pin CSI Connector|Jetson 24pin CSI Connector|' "$PREPROCESSED"
 fi
