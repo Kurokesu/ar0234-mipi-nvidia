@@ -15,7 +15,7 @@ Connect camera to `cam0` port.
 Install required tools:
 
 ```bash
-sudo apt install -y dkms
+sudo apt install -y --no-install-recommends dkms
 ```
 
 Clone the repository to your Jetson machine and navigate to the cloned directory:
