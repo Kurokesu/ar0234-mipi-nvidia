@@ -6,7 +6,7 @@
  * Copyright (c) 2026, UAB Kurokesu. All rights reserved.
  */
 
-// #define DEBUG
+/* #define DEBUG */
 
 #include <nvidia/conftest.h>
 
