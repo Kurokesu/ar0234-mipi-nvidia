@@ -236,9 +236,8 @@ static int ar0234_set_frame_rate(struct tegracam_device *tc_dev, s64 val)
 	else if (frame_length_lines > AR0234_FLL_MAX)
 		frame_length_lines = AR0234_FLL_MAX;
 
-	dev_dbg(s_data->dev,
-		"%s: val: %llde-6 [fps], frame_length: %u [lines]\n", __func__,
-		val, frame_length_lines);
+	dev_dbg(s_data->dev, "%s: %d fps, frame_length: %u lines\n", __func__,
+		(int)(val / 1000000), frame_length_lines);
 
 	err = ar0234_write_reg_16(s_data, AR0234_REG_FRAME_LENGTH_LINES,
 				  frame_length_lines);
