@@ -43,6 +43,16 @@ MODULE_DEVICE_TABLE(of, ar0234_of_match);
 static int test_mode;
 module_param(test_mode, int, 0644);
 
+static bool flash;
+module_param(flash, bool, 0644);
+MODULE_PARM_DESC(flash, "Enable flash output on FLASH pin (default: false)");
+
+static int flash_delay;
+module_param(flash_delay, int, 0644);
+MODULE_PARM_DESC(
+	flash_delay,
+	"Flash delay: negative=lead (before exposure), positive=lag, range -127..127");
+
 static const u32 ctrl_cid_list[] = {
 	TEGRA_CAMERA_CID_GAIN,
 	TEGRA_CAMERA_CID_EXPOSURE,
@@ -607,7 +617,15 @@ static int ar0234_start_streaming(struct tegracam_device *tc_dev)
 			return err;
 	}
 
-	return ar0234_write_reg_8(s_data, AR0234_REG_MODE_SELECT, 0x01);
+	if (flash) {
+		u16 flash_val = AR0234_FLASH_ENABLE | ((u8)flash_delay);
+
+		err = ar0234_write_reg_16(s_data, AR0234_REG_LED_FLASH_CONTROL,
+					  flash_val);
+		if (err)
+			return err;
+	}
+	return err;
 }
 
 static int ar0234_stop_streaming(struct tegracam_device *tc_dev)
