@@ -105,6 +105,49 @@ gst-launch-1.0 -e \
 nvgstcapture-1.0 --sensor-id 0
 ```
 
+## Trigger modes
+
+AR0234 supports two external trigger modes. Both use `TRIG` pin on camera module as external signal input. `TRIG` is a **1.8V logic level** input wired directly to sensor. Trigger pulse only initiates capture - exposure time remains controlled by sensor's integration time register.
+
+| trigger_mode | Description |
+| ------------ | ----------- |
+| 0 | Off (free-running, default) |
+| 1 | External trigger (pulsed/automatic) |
+| 2 | Sync-sink |
+
+### external-trigger
+
+Sensor stays in standby and waits for activity on `TRIG` pin. Exposure and readout happen sequentially - readout does not begin until exposure is complete. Two sub-modes are available:
+
+- **Pulsed** - each high pulse on `TRIG` pin captures a single frame (minimum pulse width 125 ns - 3 EXTCLK cycles at 24 MHz). Framerate is determined by pulse frequency.
+- **Automatic** - if `TRIG` signal stays high, sensor outputs frames continuously at configured framerate.
+
+```bash
+echo 1 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
+```
+
+After enabling trigger mode start sensor stream via `v4l2`. Frames will arrive when there is signal on `TRIG`.
+
+```bash
+v4l2-ctl -d /dev/video0 --stream-mmap --stream-count=1000 --stream-to=/dev/null
+```
+
+### sync-sink
+
+Sensor streams continuously but locks frame timing to external `TRIG` signal. Unlike `external-trigger`, exposure and readout overlap (pipelined), so higher framerates are possible. Trigger period must not be shorter than configured frame length.
+
+```bash
+echo 2 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
+```
+
+### Disable trigger
+
+```bash
+echo 0 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
+```
+
+```
+
 ## Test mode
 
 AR0234 has a built-in test pattern generator for verifying data validity.
