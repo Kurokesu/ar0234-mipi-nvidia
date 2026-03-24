@@ -146,6 +146,40 @@ echo 2 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
 echo 0 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
 ```
 
+## Flash output
+
+AR0234 has a `FLASH` output pin (1.8V logic level) that goes HIGH during sensor exposure, useful for synchronizing external illumination such as strobes or LEDs.
+
+| Parameter | Type | Description |
+| --------- | ---- | ----------- |
+| flash | bool | Enable flash output on FLASH pin |
+| flash_delay | int | Signed delay (-127..127), negative = lead, positive = lag |
+
+To enable flash output:
+
+```bash
+echo Y | sudo tee /sys/module/nv_ar0234/parameters/flash
+```
+
+The flash signal start can be shifted relative to exposure using `flash_delay`:
+
+- **Negative values** (lead) - flash starts *before* exposure, extending total flash time
+- **Positive values** (lag) - flash starts *after* exposure begins, shortening total flash time
+
+`flash_delay` accepts values in the range of -127 to 127, where each unit is approximately **6.8 us** (2-lane).
+
+```bash
+# Flash starts ~68 us before exposure (2-lane)
+echo -10 | sudo tee /sys/module/nv_ar0234/parameters/flash_delay
+
+# Flash starts ~68 us after exposure begins (2-lane)
+echo 10 | sudo tee /sys/module/nv_ar0234/parameters/flash_delay
+```
+
+Disable flash output:
+
+```bash
+echo N | sudo tee /sys/module/nv_ar0234/parameters/flash
 ```
 
 ## Test mode
