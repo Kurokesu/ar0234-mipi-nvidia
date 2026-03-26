@@ -7,7 +7,7 @@ NVIDIA Jetson kernel driver for Onsemi AR0234CS — a 2.3 MP global shutter 1/2.
 
 - 2-lane MIPI CSI-2
 - 10-bit RAW output
-- 1920×1200 @ 30 fps
+- 1920×1200 @ 60 fps
 
 > [!NOTE]
 > Currently, only `cam0` port support is implemented.

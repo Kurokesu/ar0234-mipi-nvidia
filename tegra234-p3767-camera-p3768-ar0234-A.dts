@@ -278,7 +278,7 @@
 								min_hdr_ratio = "1";
 								max_hdr_ratio = "1";
 								min_framerate = "2000000"; /* 2.0 fps */
-								max_framerate = "30000000"; /* 30.0 fps */
+								max_framerate = "60000000"; /* 60.0 fps */
 								step_framerate = "1";
 								default_framerate = "30000000"; /* 30.0 fps */
 								min_exp_time = "28"; /* us */
