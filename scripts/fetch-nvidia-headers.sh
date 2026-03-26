@@ -18,21 +18,13 @@ GITLAB_BASE="https://gitlab.com/nvidia/nv-tegra/device/hardware/nvidia/t23x-publ
 
 # Auto-detect tag from /etc/nv_tegra_release if not provided
 if [ -z "$TAG" ]; then
-    RELEASE_FILE="/etc/nv_tegra_release"
-    if [ ! -f "$RELEASE_FILE" ]; then
-        echo "ERROR: $RELEASE_FILE not found -- is this a Jetson?" >&2
-        exit 1
-    fi
-    L4T_MAJOR=$(grep -oP 'R\K[0-9]+' "$RELEASE_FILE" | head -1)
-    L4T_MINOR=$(grep -oP 'REVISION:\s*\K[0-9]+' "$RELEASE_FILE" | head -1)
-    if [ -z "$L4T_MAJOR" ] || [ -z "$L4T_MINOR" ]; then
-        echo "ERROR: could not parse L4T version from $RELEASE_FILE" >&2
-        exit 1
-    fi
-    TAG="jetson_${L4T_MAJOR}.${L4T_MINOR}"
+    L4T_MAJOR=$(grep -oP 'R\K[0-9]+' /etc/nv_tegra_release | head -1)
+    L4T_MINOR=$(grep -oP 'REVISION:\s*\K[0-9]+' /etc/nv_tegra_release | head -1)
+    L4T_PATCH=$(grep -oP 'REVISION:\s*[0-9]+\.\K[0-9]+' /etc/nv_tegra_release | head -1)
+    # NVIDIA omits .0 patch in GitLab tags (e.g. jetson_36.5, not jetson_36.5.0)
+    if [ "$L4T_PATCH" = "0" ]; then L4T_PATCH=""; fi
+    TAG="jetson_${L4T_MAJOR}.${L4T_MINOR}${L4T_PATCH:+.${L4T_PATCH}}"
 fi
-
-echo "  L4T tag: $TAG"
 
 REPO_PATH="include/platforms/dt-bindings/tegra234-p3767-0000-common.h"
 LOCAL_FILE="$OUT_DIR/dt-bindings/tegra234-p3767-0000-common.h"

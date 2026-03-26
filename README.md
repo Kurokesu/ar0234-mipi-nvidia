@@ -1,24 +1,26 @@
-# ar0234 MIPI NVIDIA driver
+# AR0234 MIPI NVIDIA driver
 
-![JetPack 6.2.1](https://img.shields.io/badge/JetPack_6.2.1-L4T_36.4.4-green?logo=nvidia&logoColor=white)
-![JetPack 6.2.2](https://img.shields.io/badge/JetPack_6.2.2-L4T_36.5.0-green?logo=nvidia&logoColor=white)
+![JetPack 6.2.1](https://img.shields.io/badge/JetPack_6.2.1-L4T_36.4.4-brightgreen?logo=nvidia&logoColor=white)
+![JetPack 6.2.2](https://img.shields.io/badge/JetPack_6.2.2-L4T_36.5.0-brightgreen?logo=nvidia&logoColor=white)
 
-## Quickstart
+NVIDIA Jetson kernel driver for Onsemi AR0234CS — a 2.3 MP global shutter 1/2.6" CMOS sensor.
 
-Connect camera to `cam0` port.
+- 2-lane MIPI CSI-2
+- 10-bit RAW output
+- 1920×1200 @ 30 fps
 
 > [!NOTE]
 > Currently, only `cam0` port support is implemented.
 
----
+## Setup
 
 Install required tools:
 
 ```bash
-sudo apt install -y dkms
+sudo apt install -y --no-install-recommends dkms
 ```
 
-Clone the repository to your Jetson machine and navigate to the cloned directory:
+Clone this repository:
 
 ```bash
 cd ~
@@ -26,36 +28,30 @@ git clone https://github.com/Kurokesu/ar0234-mipi-nvidia.git
 cd ar0234-mipi-nvidia/
 ```
 
----
-
-Build and install:
+Run setup script:
 
 ```bash
 sudo ./setup.sh
 ```
 
-The setup script:
-- Fetches NVIDIA device tree headers
-- Installs the kernel module via [DKMS](https://github.com/dell/dkms), which automatically rebuilds the module and device tree overlay when the kernel is updated
-- Builds and installs the device tree overlay (`.dtbo`) to `/boot` via a DKMS post-install hook
+Setup script:
+- Fetches NVIDIA device tree headers required for build
+- Builds and installs kernel module via [DKMS](https://github.com/dell/dkms)
+- Builds and copies device tree overlay (`.dtbo`) to `/boot`
 
----
-
-To install the ISP tuning file, run:
+Optionally, install the ISP tuning file:
 
 ```bash
 sudo cp ./tuning/camera_overrides.isp /var/nvidia/nvcam/settings
 ```
 
-To uninstall and restore the default ISP parameters, remove the overrides file:
+To restore default ISP parameters, remove the overrides file:
 
 ```bash
 sudo rm /var/nvidia/nvcam/settings/camera_overrides.isp
 ```
 
----
-
-Use the Jetson-IO tool to configure the CSI connector:
+Use Jetson-IO to configure the CSI connector:
 
 ```bash
 sudo /opt/nvidia/jetson-io/jetson-io.py
@@ -71,9 +67,7 @@ Navigate through the menu:
 4. Save pin changes
 5. Save and reboot to reconfigure pins
 
----
-
-After reboot verify that the sensor is detected over I2C:
+After reboot, verify sensor is detected:
 
 ```bash
 sudo dmesg | grep ar0234
@@ -99,17 +93,16 @@ nvgstcapture-1.0 --sensor-id 0
 
 ## Test mode
 
-The sensor has a built-in test pattern generator that can be used to verify data validity.
+AR0234 has a built-in test pattern generator for verifying data validity.
 
-After running `sudo ./setup.sh` the driver is installed and loaded automatically at boot.  
-The `test_mode` module parameter can then be controlled at runtime via sysfs:
+Enable test pattern:
 
 ```bash
 # 100% color-bar test pattern (test_mode = 2)
 echo 2 | sudo tee /sys/module/nv_ar0234/parameters/test_mode
 ```
 
-To turn the test pattern off:
+Turn test pattern off:
 
 ```bash
 echo 0 | sudo tee /sys/module/nv_ar0234/parameters/test_mode
@@ -129,11 +122,11 @@ For manual builds without DKMS:
 
 ```bash
 make              # build everything (dtbo + kernel module)
-sudo make install # copy dtbo to /boot, rmmod + insmod the module
+sudo make install # copy dtbo to /boot, rmmod + insmod
 ```
 
 > [!NOTE]
-> The module is loaded immediately via `insmod` but won't persist across reboots. Use `sudo ./setup.sh` for permanent installation via DKMS.
+> Module is loaded immediately via `insmod` but won't persist across reboots. Use `sudo ./setup.sh` for permanent installation via DKMS.
 
 Individual targets:
 
@@ -143,4 +136,4 @@ make module    # build only the kernel module
 make clean     # remove build artifacts
 ```
 
-All build artifacts are placed in the `./build` directory.
+Build artifacts are placed in `./build`.

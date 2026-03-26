@@ -18,15 +18,16 @@ DKMS_SRC="/usr/src/${PACKAGE_NAME}-${VERSION}"
 # --- Check prerequisites ---
 
 if ! command -v dkms &>/dev/null; then
-    echo "Error: dkms is not installed. Install it with: sudo apt install dkms"
+    echo "Error: dkms is not installed. Install it with: sudo apt install --no-install-recommends dkms"
     exit 1
 fi
 
-# --- Remove old DKMS registration if present ---
+# --- Remove previous DKMS registration if present ---
 
-if dkms status "${PACKAGE_NAME}/${VERSION}" 2>/dev/null | grep -q .; then
-    echo "Removing previous DKMS registration for ${PACKAGE_NAME}/${VERSION}..."
-    dkms remove "${PACKAGE_NAME}/${VERSION}" --all 2>/dev/null || true
+OLD_VER=$(dkms status -m "$PACKAGE_NAME" 2>/dev/null | cut -d'/' -f2 | cut -d',' -f1)
+if [ -n "$OLD_VER" ]; then
+    echo "Removing previous DKMS registration: ${PACKAGE_NAME}/${OLD_VER}"
+    dkms remove "${PACKAGE_NAME}/${OLD_VER}" --all || true
 fi
 
 # --- Back up and remove stock NVIDIA ar0234 driver if present ---
