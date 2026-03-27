@@ -48,7 +48,7 @@ cp "$SCRIPT_DIR/dkms.conf" "$DKMS_SRC/"
 cp "$SCRIPT_DIR/dkms.postinst" "$DKMS_SRC/"
 cp "$SCRIPT_DIR/nv_ar0234.c" "$DKMS_SRC/"
 cp "$SCRIPT_DIR/ar0234_mode_tbls.h" "$DKMS_SRC/"
-cp "$SCRIPT_DIR/tegra234-p3767-camera-p3768-ar0234-A.dts" "$DKMS_SRC/"
+cp "$SCRIPT_DIR"/tegra234-p3767-camera-p3768-ar0234-*.dts "$DKMS_SRC/"
 cp -r "$SCRIPT_DIR/scripts" "$DKMS_SRC/"
 
 # --- Fetch NVIDIA device tree header (requires internet) ---
