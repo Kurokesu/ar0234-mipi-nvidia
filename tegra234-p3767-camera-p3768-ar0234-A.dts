@@ -109,21 +109,7 @@
 							physical_w = "5.78";
 							physical_h = "3.62";
 							sensor_model = "ar0234";
-							/* Define any required hw resources needed by driver */
-							/* ie. clocks, io pins, power sources */
-							/* Defines number of frames to be dropped by driver internally after applying */
-							/* sensor crop settings. Some sensors send corrupt frames after applying */
-							/* crop co-ordinates */
-
-							/* if true, delay gain setting by one frame to be in sync with exposure */
-							delayed_gain = "false";
-
-							/* Convert Gain to unit of dB (decibel) before passing to kernel driver */
-							use_decibel_gain = "false";
-
-							/* enable CID_SENSOR_MODE_ID for sensor modes selection */
 							use_sensor_mode_id = "true";
-
 							/**
 							* ==== Modes ====
 							* A modeX node is required to support v4l2 driver
