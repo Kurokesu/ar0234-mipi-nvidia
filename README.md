@@ -1,4 +1,4 @@
-# AR0234 MIPI NVIDIA driver
+# AR0234 kernel driver for NVIDIA Jetson
 
 ![JetPack 6.2.1](https://img.shields.io/badge/JetPack_6.2.1-L4T_36.4.4-brightgreen?logo=nvidia&logoColor=white)
 ![JetPack 6.2.2](https://img.shields.io/badge/JetPack_6.2.2-L4T_36.5.0-brightgreen?logo=nvidia&logoColor=white)
@@ -21,8 +21,8 @@ Clone this repository:
 
 ```bash
 cd ~
-git clone https://github.com/Kurokesu/ar0234-mipi-nvidia.git
-cd ar0234-mipi-nvidia/
+git clone https://github.com/Kurokesu/ar0234-jetson-driver.git
+cd ar0234-jetson-driver/
 ```
 
 Run setup script:
