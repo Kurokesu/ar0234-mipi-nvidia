@@ -3,7 +3,7 @@
 ![JetPack 6.2.1](https://img.shields.io/badge/JetPack_6.2.1-L4T_36.4.4-brightgreen?logo=nvidia&logoColor=white)
 ![JetPack 6.2.2](https://img.shields.io/badge/JetPack_6.2.2-L4T_36.5.0-brightgreen?logo=nvidia&logoColor=white)
 
-NVIDIA Jetson kernel driver for Onsemi AR0234 — a 2.3 MP global shutter 1/2.6" CMOS sensor.
+NVIDIA Jetson kernel driver for Onsemi AR0234, a 2.3 MP global shutter 1/2.6" CMOS sensor.
 
 - 2-lane MIPI CSI-2
 - 10-bit RAW output
@@ -79,10 +79,24 @@ sudo dmesg | grep ar0234
 
 ### GStreamer
 
+Single:
+
 ```bash
 gst-launch-1.0 -e nvarguscamerasrc sensor-id=0 ! \
    'video/x-raw(memory:NVMM),width=1920,height=1200,framerate=30/1' ! \
    queue ! nvvidconv ! queue ! nveglglessink
+```
+
+Dual:
+
+```bash
+gst-launch-1.0 -e \
+   nvarguscamerasrc sensor-id=0 ! \
+      'video/x-raw(memory:NVMM),width=1920,height=1200,framerate=30/1' ! \
+      queue ! nvvidconv ! queue ! nveglglessink \
+   nvarguscamerasrc sensor-id=1 ! \
+      'video/x-raw(memory:NVMM),width=1920,height=1200,framerate=30/1' ! \
+      queue ! nvvidconv ! queue ! nveglglessink
 ```
 
 ### NVIDIA sample camera capture application
