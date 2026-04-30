@@ -12,10 +12,10 @@
 #include <dt-bindings/tegra234-p3767-0000-common.h>
 
 / {
-	overlay-name = "Camera AR0234-A";
+	overlay-name = "Camera AR0234-C";
 	jetson-header-name = "Jetson 22pin CSI Connector";
 	compatible = JETSON_COMPATIBLE_P3768;
-	/* AR0234 connected to cam0 port */
+	/* AR0234 connected to cam1 port */
 
 	fragment@0 {
 		target-path = "/";
@@ -27,10 +27,10 @@
 					#size-cells = <0>;
 					port@0 {
 						reg = <0>;
-						rbpcv3_ar0234_vi_in0: endpoint {
-							port-index = <1>;
+						rbpcv3_ar0234_vi_in1: endpoint {
+							port-index = <2>;
 							bus-width = <2>;
-							remote-endpoint = <&rbpcv3_ar0234_csi_out0>;
+							remote-endpoint = <&rbpcv3_ar0234_csi_out1>;
 						};
 					};
 				};
@@ -46,13 +46,13 @@
 				 * in the module's specsheet from the vendor.
 				 */
 				modules {
-					module0 {
-						badge = "kurokesu_front_234M12";
-						position = "front";
+					module1 {
+						badge = "kurokesu_rear_234M12";
+						position = "rear";
 						orientation = "0";
 						drivernode0 {
 							pcl_id = "v4l2_sensor";
-							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/cam_i2cmux/i2c@0/rbpcv3_ar0234_a@10";
+							sysfs-device-tree = "/sys/firmware/devicetree/base/bus@0/cam_i2cmux/i2c@1/rbpcv3_ar0234_c@10";
 						};
 					};
 				};
@@ -70,16 +70,16 @@
 								#size-cells = <0>;
 								port@0 {
 									reg = <0>;
-									rbpcv3_ar0234_csi_in0: endpoint@0 {
-										port-index = <1>;
+									rbpcv3_ar0234_csi_in1: endpoint@0 {
+										port-index = <2>;
 										bus-width = <2>;
-										remote-endpoint = <&rbpcv3_ar0234_out0>;
+										remote-endpoint = <&rbpcv3_ar0234_out1>;
 									};
 								};
 								port@1 {
 									reg = <1>;
-									rbpcv3_ar0234_csi_out0: endpoint@1 {
-										remote-endpoint = <&rbpcv3_ar0234_vi_in0>;
+									rbpcv3_ar0234_csi_out1: endpoint@1 {
+										remote-endpoint = <&rbpcv3_ar0234_vi_in1>;
 									};
 								};
 							};
@@ -93,13 +93,13 @@
 					#size-cells = <0>;
 					mux-gpios = <&gpio_aon CAM_I2C_MUX GPIO_ACTIVE_HIGH>;
 					i2c-parent = <&cam_i2c>;
-					i2c@0 {
+					i2c@1 {
 						status = "okay";
-						reg = <0>;
+						reg = <1>;
 						#address-cells = <1>;
 						#size-cells = <0>;
-						rbpcv3_ar0234_a@10 {
-							reset-gpios = <&gpio CAM0_PWDN GPIO_ACTIVE_HIGH>;
+						rbpcv3_ar0234_c@10 {
+							reset-gpios = <&gpio CAM1_PWDN GPIO_ACTIVE_HIGH>;
 							compatible = "onnn,ar0234";
 							/* I2C device address */
 							reg = <0x10>;
@@ -203,12 +203,12 @@
 							mode0 { /* AR0234_MODE_1920X1200_2LANE */
 								mclk_khz = "24000";
 								num_lanes = "2";
-								tegra_sinterface = "serial_b";
+								tegra_sinterface = "serial_c";
 								phy_mode = "DPHY";
 								discontinuous_clk = "no";
 								dpcm_enable = "false";
 								cil_settletime = "0";
-								lane_polarity = "6";
+								lane_polarity = "0";
 								active_w = "1920";
 								active_h = "1200";
 								mode_type = "bayer";
@@ -243,10 +243,10 @@
 								#size-cells = <0>;
 								port@0 {
 									reg = <0>;
-									rbpcv3_ar0234_out0: endpoint {
-										port-index = <1>;
+									rbpcv3_ar0234_out1: endpoint {
+										port-index = <2>;
 										bus-width = <2>;
-										remote-endpoint = <&rbpcv3_ar0234_csi_in0>;
+										remote-endpoint = <&rbpcv3_ar0234_csi_in1>;
 									};
 								};
 							};

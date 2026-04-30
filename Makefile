@@ -7,8 +7,8 @@
 SRC_DIR   := $(shell pwd)
 BUILD_DIR := $(SRC_DIR)/build
 
-# --- Device tree overlay ---
-DTS       := tegra234-p3767-camera-p3768-ar0234-A.dts
+# --- Device tree overlays ---
+DTS       := $(wildcard tegra234-p3767-camera-p3768-ar0234-*.dts)
 DTBO      := $(DTS:.dts=.dtbo)
 
 # Kernel headers include path (for dt-bindings/gpio/*.h)
@@ -41,9 +41,9 @@ CONFTEST_H := $(LOCAL_INCLUDE)/nvidia/conftest.h
 # --- Targets ---
 .PHONY: all dtbo module clean install
 
-all: $(BUILD_DIR)/$(DTBO) $(BUILD_DIR)/nv_ar0234.ko
+all: $(addprefix $(BUILD_DIR)/,$(DTBO)) $(BUILD_DIR)/nv_ar0234.ko
 
-dtbo: $(BUILD_DIR)/$(DTBO)
+dtbo: $(addprefix $(BUILD_DIR)/,$(DTBO))
 module: $(BUILD_DIR)/nv_ar0234.ko
 
 $(DT_HEADER): | $(BUILD_DIR)
@@ -54,19 +54,19 @@ $(CONFTEST_H): | $(BUILD_DIR)
 	@echo "  GEN     conftest.h"
 	@./scripts/conftest.sh $(LOCAL_INCLUDE) $(KDIR)
 
-# Build device tree overlay
-$(BUILD_DIR)/$(DTBO): $(DTS) $(DT_HEADER) | $(BUILD_DIR)
+# Build device tree overlay (pattern rule for all DTS variants)
+$(BUILD_DIR)/%.dtbo: %.dts $(DT_HEADER) | $(BUILD_DIR)
 	@echo "  CPP     $<"
-	@$(CPP) $(CPP_FLAGS) -o $(BUILD_DIR)/$(DTS:.dts=.dts.preprocessed) $<
+	@$(CPP) $(CPP_FLAGS) -o $(BUILD_DIR)/$*.dts.preprocessed $<
 	@# DTS defaults to 22pin (JetPack 6.2.2+). Patch to 24pin for L4T < 36.5.
 	@if [ $$(($(L4T_MAJOR) * 100 + $(L4T_MINOR))) -lt 3605 ]; then \
 		echo "  PATCH   jetson-header-name -> 24pin (L4T $(L4T_MAJOR).$(L4T_MINOR))"; \
 		sed -i 's|Jetson 22pin CSI Connector|Jetson 24pin CSI Connector|' \
-			$(BUILD_DIR)/$(DTS:.dts=.dts.preprocessed); \
+			$(BUILD_DIR)/$*.dts.preprocessed; \
 	fi
 	@echo "  DTC     $@"
-	@$(DTC) $(DTC_FLAGS) -o $@ $(BUILD_DIR)/$(DTS:.dts=.dts.preprocessed)
-	@rm -f $(BUILD_DIR)/$(DTS:.dts=.dts.preprocessed)
+	@$(DTC) $(DTC_FLAGS) -o $@ $(BUILD_DIR)/$*.dts.preprocessed
+	@rm -f $(BUILD_DIR)/$*.dts.preprocessed
 	@echo "  Built:  $@"
 
 # Build kernel module -- all kbuild artifacts go into build/
@@ -86,9 +86,11 @@ $(BUILD_DIR)/nv_ar0234.ko: $(KBUILD_SRCS) $(CONFTEST_H) | $(BUILD_DIR)
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
-install: $(BUILD_DIR)/$(DTBO) $(BUILD_DIR)/nv_ar0234.ko
-	@echo "  INSTALL $(DTBO) -> /boot/$(DTBO)"
-	sudo cp $(BUILD_DIR)/$(DTBO) /boot/$(DTBO)
+install: $(addprefix $(BUILD_DIR)/,$(DTBO)) $(BUILD_DIR)/nv_ar0234.ko
+	@for dtbo in $(DTBO); do \
+		echo "  INSTALL $$dtbo -> /boot/$$dtbo"; \
+		sudo cp $(BUILD_DIR)/$$dtbo /boot/$$dtbo; \
+	done
 	@echo "  RELOAD  nv_ar0234.ko"
 	@sudo rmmod nv_ar0234 2>/dev/null || true
 	sudo insmod $(BUILD_DIR)/nv_ar0234.ko

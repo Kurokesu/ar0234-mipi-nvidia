@@ -34,7 +34,7 @@
 #define AR0234_FLL_OVERHEAD (5)
 
 static const struct of_device_id ar0234_of_match[] = {
-	{ .compatible = "onnn,ar0234cs" },
+	{ .compatible = "onnn,ar0234" },
 	{},
 };
 

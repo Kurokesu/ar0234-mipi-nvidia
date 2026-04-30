@@ -3,14 +3,11 @@
 ![JetPack 6.2.1](https://img.shields.io/badge/JetPack_6.2.1-L4T_36.4.4-brightgreen?logo=nvidia&logoColor=white)
 ![JetPack 6.2.2](https://img.shields.io/badge/JetPack_6.2.2-L4T_36.5.0-brightgreen?logo=nvidia&logoColor=white)
 
-NVIDIA Jetson kernel driver for Onsemi AR0234CS — a 2.3 MP global shutter 1/2.6" CMOS sensor.
+NVIDIA Jetson kernel driver for Onsemi AR0234, a 2.3 MP global shutter 1/2.6" CMOS sensor.
 
 - 2-lane MIPI CSI-2
 - 10-bit RAW output
 - 1920×1200 @ 60 fps
-
-> [!NOTE]
-> Currently, only `cam0` port support is implemented.
 
 ## Setup
 
@@ -60,7 +57,10 @@ sudo /opt/nvidia/jetson-io/jetson-io.py
 Navigate through the menu:
 1. Configure Jetson CSI Connector (named "22pin" on 6.2.2, "24pin" on 6.2.1)
 2. Configure for compatible hardware
-3. Select Camera AR0234-A
+3. Select port configuration:
+   - **Camera AR0234-A** - cam0
+   - **Camera AR0234-C** - cam1
+   - **Camera AR0234 Dual** - cam0 + cam1
 
 ![jetson-io-tool](./img/jetson-io-tool.png "jetson-io-tool")
 
@@ -79,10 +79,24 @@ sudo dmesg | grep ar0234
 
 ### GStreamer
 
+Single:
+
 ```bash
 gst-launch-1.0 -e nvarguscamerasrc sensor-id=0 ! \
    'video/x-raw(memory:NVMM),width=1920,height=1200,framerate=30/1' ! \
    queue ! nvvidconv ! queue ! nveglglessink
+```
+
+Dual:
+
+```bash
+gst-launch-1.0 -e \
+   nvarguscamerasrc sensor-id=0 ! \
+      'video/x-raw(memory:NVMM),width=1920,height=1200,framerate=30/1' ! \
+      queue ! nvvidconv ! queue ! nveglglessink \
+   nvarguscamerasrc sensor-id=1 ! \
+      'video/x-raw(memory:NVMM),width=1920,height=1200,framerate=30/1' ! \
+      queue ! nvvidconv ! queue ! nveglglessink
 ```
 
 ### NVIDIA sample camera capture application
