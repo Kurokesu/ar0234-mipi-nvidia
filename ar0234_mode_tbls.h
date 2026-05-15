@@ -59,6 +59,7 @@
 #define AR0234_REG_MIPI_CNTRL 0x3354
 
 #define AR0234_MFR_30BA_GAIN_BITS(_val) (0x7620 | (_val))
+#define AR0234_MFR_30BA_DEFAULT AR0234_MFR_30BA_GAIN_BITS(2)
 #define AR0234_SERIAL_FORMAT_NUM_LANES(_num_lanes) (0x0200 | (_num_lanes))
 
 /* AR0234 PLL configs */

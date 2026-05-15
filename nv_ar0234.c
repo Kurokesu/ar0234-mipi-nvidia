@@ -569,17 +569,21 @@ static int ar0234_set_mode(struct tegracam_device *tc_dev)
 	if (err)
 		return err;
 
-	err = ar0234_write_table(s_data,
-				 mode_table[AR0234_PIXCLK_45MHZ_MFR_SETTINGS]);
-	if (err)
-		return err;
+	if (num_lanes == 2) {
+		err = ar0234_write_table(
+			s_data, mode_table[AR0234_PIXCLK_45MHZ_MFR_SETTINGS]);
+		if (err)
+			return err;
 
-	err = ar0234_write_reg_16(s_data, AR0234_REG_MFR_30BA,
-				  AR0234_MFR_30BA_GAIN_BITS(6));
-	if (err)
-		return err;
+		err = ar0234_write_reg_16(s_data, AR0234_REG_MFR_30BA,
+					  AR0234_MFR_30BA_GAIN_BITS(6));
+		if (err)
+			return err;
 
-	priv->mfr_30ba_val = AR0234_MFR_30BA_GAIN_BITS(6);
+		priv->mfr_30ba_val = AR0234_MFR_30BA_GAIN_BITS(6);
+	} else {
+		priv->mfr_30ba_val = AR0234_MFR_30BA_DEFAULT;
+	}
 
 	err = ar0234_write_table(s_data, mode_table[AR0234_MODE_1920X1200]);
 
