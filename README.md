@@ -135,8 +135,10 @@ echo 1 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
 After enabling trigger mode start sensor stream via `v4l2`. Frames will arrive when there is signal on `TRIG`.
 
 ```bash
-v4l2-ctl -d /dev/video0 --stream-mmap --stream-count=1000 --stream-to=/dev/null
+v4l2-ctl -d /dev/video0 --set-ctrl override_capture_timeout_ms=-1 --stream-mmap --stream-count=1000 --stream-to=/dev/null
 ```
+
+*Without `override_capture_timeout_ms=-1` capture fails if first trigger arrives later than default 2.5 s VI timeout. On Argus path use `enableCamInfiniteTimeout=1` instead.*
 
 ### sync-sink
 
