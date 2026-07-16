@@ -107,7 +107,7 @@ nvgstcapture-1.0 --sensor-id 0
 
 ## Trigger modes
 
-AR0234 supports two external trigger modes. Both use `TRIG` pin on camera module as external signal input. `TRIG` is a **1.8V logic level** input wired directly to sensor. Trigger pulse only initiates capture - exposure time remains controlled by sensor's integration time register.
+AR0234 supports two external trigger modes. Both use `TRIG` pin on camera module as external signal input. `TRIG` is a **1.8V logic level** input wired directly to sensor. Trigger pulse only initiates capture, exposure time remains controlled by sensor's integration time register.
 
 `TRIG` and `FLASH` signals are available on AUX connector:
 
@@ -123,10 +123,10 @@ AR0234 supports two external trigger modes. Both use `TRIG` pin on camera module
 
 ### external-trigger
 
-Sensor stays in standby and waits for activity on `TRIG` pin. Exposure and readout happen sequentially - readout does not begin until exposure is complete. Two sub-modes are available:
+Sensor stays in standby and waits for activity on `TRIG` pin. Exposure and readout happen sequentially: readout does not begin until exposure is complete. Two sub-modes are available:
 
-- **Pulsed** - each high pulse on `TRIG` pin captures a single frame (minimum pulse width 125 ns - 3 EXTCLK cycles at 24 MHz). Framerate is determined by pulse frequency.
-- **Automatic** - if `TRIG` signal stays high, sensor outputs frames continuously at configured framerate.
+- **Pulsed**: each high pulse on `TRIG` pin captures a single frame (minimum pulse width 125 ns, 3 EXTCLK cycles at 24 MHz). Framerate is determined by pulse frequency.
+- **Automatic**: if `TRIG` signal stays high, sensor outputs frames continuously at configured framerate.
 
 ```bash
 echo 1 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
@@ -169,8 +169,8 @@ echo Y | sudo tee /sys/module/nv_ar0234/parameters/flash
 
 The flash signal start can be shifted relative to exposure using `flash_delay`:
 
-- **Negative values** (lead) - flash starts *before* exposure, extending total flash time
-- **Positive values** (lag) - flash starts *after* exposure begins, shortening total flash time
+- **Negative values** (lead): flash starts *before* exposure, extending total flash time
+- **Positive values** (lag): flash starts *after* exposure begins, shortening total flash time
 
 `flash_delay` accepts values in the range of -127 to 127, where each unit is approximately **6.8 µs** (2-lane).
 
