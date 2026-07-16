@@ -172,13 +172,13 @@ The flash signal start can be shifted relative to exposure using `flash_delay`:
 - **Negative values** (lead) - flash starts *before* exposure, extending total flash time
 - **Positive values** (lag) - flash starts *after* exposure begins, shortening total flash time
 
-`flash_delay` accepts values in the range of -127 to 127, where each unit is approximately **6.8 us** (2-lane).
+`flash_delay` accepts values in the range of -127 to 127, where each unit is approximately **6.8 µs** (2-lane).
 
 ```bash
-# Flash starts ~68 us before exposure (2-lane)
+# Flash starts ~68 µs before exposure (2-lane)
 echo -10 | sudo tee /sys/module/nv_ar0234/parameters/flash_delay
 
-# Flash starts ~68 us after exposure begins (2-lane)
+# Flash starts ~68 µs after exposure begins (2-lane)
 echo 10 | sudo tee /sys/module/nv_ar0234/parameters/flash_delay
 ```
 
