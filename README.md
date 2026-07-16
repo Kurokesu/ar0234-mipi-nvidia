@@ -109,6 +109,12 @@ nvgstcapture-1.0 --sensor-id 0
 
 AR0234 supports two external trigger modes. Both use `TRIG` pin on camera module as external signal input. `TRIG` is a **1.8V logic level** input wired directly to sensor. Trigger pulse only initiates capture - exposure time remains controlled by sensor's integration time register.
 
+`TRIG` and `FLASH` signals are available on AUX connector:
+
+![ar0234-aux](./docs/ar0234-aux.png "ar0234-aux")
+
+*Full module pinout and AUX connector part number are documented in [234x-CSI wiki page](https://wiki.kurokesu.com/books/mipi-csi2-camera-modules/page/234x-csi).*
+
 | trigger_mode | Description |
 | ------------ | ----------- |
 | 0 | Off (free-running, default) |
