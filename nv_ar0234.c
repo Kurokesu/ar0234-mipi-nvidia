@@ -33,6 +33,10 @@
 #define AR0234_FLL_MAX (0xFFFF)
 #define AR0234_FLL_OVERHEAD (5)
 
+/* Trigger modes */
+#define AR0234_TRIGGER_MODE_OFF 0
+#define AR0234_TRIGGER_MODE_SLAVE_SYNC 2
+
 static const struct of_device_id ar0234_of_match[] = {
 	{ .compatible = "onnn,ar0234" },
 	{},
@@ -42,6 +46,22 @@ MODULE_DEVICE_TABLE(of, ar0234_of_match);
 
 static int test_mode;
 module_param(test_mode, int, 0644);
+
+static int trigger_mode;
+module_param(trigger_mode, int, 0644);
+MODULE_PARM_DESC(
+	trigger_mode,
+	"Trigger mode: 0=off (default), 1=external-trigger, 2=sync-sink");
+
+static bool flash;
+module_param(flash, bool, 0644);
+MODULE_PARM_DESC(flash, "Enable flash output on FLASH pin (default: false)");
+
+static int flash_delay;
+module_param(flash_delay, int, 0644);
+MODULE_PARM_DESC(
+	flash_delay,
+	"Flash delay: negative=lead (before exposure), positive=lag, range -127..127");
 
 static const u32 ctrl_cid_list[] = {
 	TEGRA_CAMERA_CID_GAIN,
@@ -607,17 +627,42 @@ static int ar0234_start_streaming(struct tegracam_device *tc_dev)
 			return err;
 	}
 
-	return ar0234_write_reg_8(s_data, AR0234_REG_MODE_SELECT, 0x01);
+	if (flash) {
+		u16 flash_val = AR0234_FLASH_ENABLE | ((u8)flash_delay);
+
+		err = ar0234_write_reg_16(s_data, AR0234_REG_LED_FLASH_CONTROL,
+					  flash_val);
+		if (err)
+			return err;
+	}
+
+	if (trigger_mode == AR0234_TRIGGER_MODE_OFF) {
+		err = ar0234_write_reg_8(s_data, AR0234_REG_MODE_SELECT, 0x01);
+	} else {
+		u16 reset_val = AR0234_RESET_DEFAULT | AR0234_RESET_GPI_EN |
+				AR0234_RESET_FORCED_PLL_ON;
+
+		if (trigger_mode == AR0234_TRIGGER_MODE_SLAVE_SYNC) {
+			reset_val |= AR0234_RESET_STREAM;
+			err = ar0234_write_reg_16(s_data,
+						  AR0234_REG_GRR_CONTROL1,
+						  AR0234_GRR_SLAVE_SH_SYNC);
+			if (err)
+				return err;
+		}
+
+		err = ar0234_write_reg_16(s_data, AR0234_REG_RESET, reset_val);
+	}
+
+	return err;
 }
 
 static int ar0234_stop_streaming(struct tegracam_device *tc_dev)
 {
-	int err;
-
 	dev_dbg(tc_dev->dev, "%s:\n", __func__);
-	err = ar0234_write_reg_8(tc_dev->s_data, AR0234_REG_MODE_SELECT, 0x00);
 
-	return err;
+	return ar0234_write_reg_16(tc_dev->s_data, AR0234_REG_RESET,
+				   AR0234_RESET_DEFAULT);
 }
 
 static struct camera_common_sensor_ops ar0234_common_ops = {

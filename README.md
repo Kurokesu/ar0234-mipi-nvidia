@@ -62,7 +62,7 @@ Navigate through the menu:
    - **Camera AR0234-C** - cam1
    - **Camera AR0234 Dual** - cam0 + cam1
 
-![jetson-io-tool](./img/jetson-io-tool.png "jetson-io-tool")
+![jetson-io-tool](./docs/jetson-io-tool.png "jetson-io-tool")
 
 4. Save pin changes
 5. Save and reboot to reconfigure pins
@@ -73,7 +73,7 @@ After reboot, verify sensor is detected:
 sudo dmesg | grep ar0234
 ```
 
-![dmesg-ar0234](./img/dmesg.png "dmesg-ar0234")
+![dmesg-ar0234](./docs/dmesg.png "dmesg-ar0234")
 
 ## Image output
 
@@ -103,6 +103,91 @@ gst-launch-1.0 -e \
 
 ```bash
 nvgstcapture-1.0 --sensor-id 0
+```
+
+## Trigger modes
+
+AR0234 supports two external trigger modes. Both use `TRIG` pin on camera module as external signal input. `TRIG` is a **1.8V logic level** input wired directly to sensor. Trigger pulse only initiates capture, exposure time remains controlled by sensor's integration time register.
+
+`TRIG` and `FLASH` signals are available on AUX connector:
+
+![ar0234-aux](./docs/ar0234-aux.png "ar0234-aux")
+
+*Full module pinout and AUX connector part number are documented in [234x-CSI wiki page](https://wiki.kurokesu.com/books/mipi-csi2-camera-modules/page/234x-csi).*
+
+| trigger_mode | Description |
+| ------------ | ----------- |
+| 0 | Off (free-running, default) |
+| 1 | External trigger (pulsed/automatic) |
+| 2 | Sync-sink |
+
+### external-trigger
+
+Sensor stays in standby and waits for activity on `TRIG` pin. Exposure and readout happen sequentially: readout does not begin until exposure is complete. Two sub-modes are available:
+
+- **Pulsed**: each high pulse on `TRIG` pin captures a single frame (minimum pulse width 125 ns, 3 EXTCLK cycles at 24 MHz). Framerate is determined by pulse frequency.
+- **Automatic**: if `TRIG` signal stays high, sensor outputs frames continuously at configured framerate.
+
+```bash
+echo 1 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
+```
+
+After enabling trigger mode start sensor stream via `v4l2`. Frames will arrive when there is signal on `TRIG`.
+
+```bash
+v4l2-ctl -d /dev/video0 --set-ctrl override_capture_timeout_ms=-1 --stream-mmap --stream-count=1000 --stream-to=/dev/null
+```
+
+*Without `override_capture_timeout_ms=-1` capture fails if first trigger arrives later than default 2.5 s VI timeout. On Argus path use `enableCamInfiniteTimeout=1` instead.*
+
+### sync-sink
+
+Sensor streams continuously but locks frame timing to external `TRIG` signal. Unlike `external-trigger`, exposure and readout overlap (pipelined), so higher framerates are possible. Trigger period must not be shorter than configured frame length.
+
+```bash
+echo 2 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
+```
+
+### Disable trigger
+
+```bash
+echo 0 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
+```
+
+## Flash output
+
+AR0234 has a `FLASH` output pin (1.8V logic level) that goes HIGH during sensor exposure, useful for synchronizing external illumination such as strobes or LEDs.
+
+| Parameter | Type | Description |
+| --------- | ---- | ----------- |
+| flash | bool | Enable flash output on FLASH pin |
+| flash_delay | int | Signed delay (-127..127), negative = lead, positive = lag |
+
+To enable flash output:
+
+```bash
+echo Y | sudo tee /sys/module/nv_ar0234/parameters/flash
+```
+
+The flash signal start can be shifted relative to exposure using `flash_delay`:
+
+- **Negative values** (lead): flash starts *before* exposure, extending total flash time
+- **Positive values** (lag): flash starts *after* exposure begins, shortening total flash time
+
+`flash_delay` accepts values in the range of -127 to 127, where each unit is approximately **6.8 µs** (2-lane).
+
+```bash
+# Flash starts ~68 µs before exposure (2-lane)
+echo -10 | sudo tee /sys/module/nv_ar0234/parameters/flash_delay
+
+# Flash starts ~68 µs after exposure begins (2-lane)
+echo 10 | sudo tee /sys/module/nv_ar0234/parameters/flash_delay
+```
+
+Disable flash output:
+
+```bash
+echo N | sudo tee /sys/module/nv_ar0234/parameters/flash
 ```
 
 ## Test mode
