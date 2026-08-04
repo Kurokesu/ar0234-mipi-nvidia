@@ -1,5 +1,7 @@
 # AR0234 kernel driver for NVIDIA Jetson
 
+[![Code style](https://github.com/Kurokesu/ar0234-jetson-driver/actions/workflows/code-style.yml/badge.svg)](https://github.com/Kurokesu/ar0234-jetson-driver/actions/workflows/code-style.yml)
+[![Version](https://img.shields.io/github/v/tag/Kurokesu/ar0234-jetson-driver?sort=semver&filter=v*)](https://github.com/Kurokesu/ar0234-jetson-driver/tags)
 ![JetPack 6.2.1](https://img.shields.io/badge/JetPack_6.2.1-L4T_36.4.4-brightgreen?logo=nvidia&logoColor=white)
 ![JetPack 6.2.2](https://img.shields.io/badge/JetPack_6.2.2-L4T_36.5.0-brightgreen?logo=nvidia&logoColor=white)
 
