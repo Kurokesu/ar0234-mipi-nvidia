@@ -1,0 +1,17 @@
+name: Code style
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  jetson:
+    uses: Kurokesu/ci/.github/workflows/kernel-code-style.yml@main
+    with:
+      platform: jetson
