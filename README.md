@@ -58,7 +58,7 @@ Navigate through the menu:
    - **Camera AR0234-C** - cam1
    - **Camera AR0234 Dual** - cam0 + cam1
 
-![jetson-io-tool](./docs/jetson-io-tool.png "jetson-io-tool")
+    ![Jetson-IO menu with Camera AR0234 Dual selected.](./docs/jetson-io-tool.png)
 
 4. Save pin changes
 5. Save and reboot to reconfigure pins
@@ -107,7 +107,7 @@ AR0234 supports two external trigger modes. Both use `TRIG` pin on camera module
 
 `TRIG` and `FLASH` signals are available on AUX connector:
 
-![ar0234-aux](./docs/ar0234-aux.png "ar0234-aux")
+![AR0234 module front and back, with AUX connector pins labelled.](./docs/ar0234-aux.png)
 
 *Full module pinout and AUX connector part number are documented in [234x-CSI wiki page](https://wiki.kurokesu.com/books/mipi-csi2-camera-modules/page/234x-csi).*
 
