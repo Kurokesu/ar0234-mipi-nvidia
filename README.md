@@ -11,6 +11,10 @@ NVIDIA Jetson kernel driver for Onsemi AR0234, a 2.3 MP global shutter 1/2.6" CM
 - 10-bit RAW output
 - 1920×1200 @ 60 fps
 
+![Kurokesu camera modules connected to a Jetson carrier board over CSI ribbon cables.](./docs/kurokesu-on-jetson.jpg)
+
+*AR0234 camera modules are available at [kurokesu.com](https://www.kurokesu.com/item/234C-CSI)*
+
 ## Setup
 
 Install required tools:
