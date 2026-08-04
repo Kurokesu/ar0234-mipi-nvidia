@@ -32,21 +32,11 @@ sudo ./setup.sh
 ```
 
 Setup script:
+
 - Fetches NVIDIA device tree headers required for build
 - Builds and installs kernel module via [DKMS](https://github.com/dell/dkms)
 - Builds and copies device tree overlay (`.dtbo`) to `/boot`
-
-Optionally, install the ISP tuning file:
-
-```bash
-sudo cp ./tuning/camera_overrides.isp /var/nvidia/nvcam/settings
-```
-
-To restore default ISP parameters, remove the overrides file:
-
-```bash
-sudo rm /var/nvidia/nvcam/settings/camera_overrides.isp
-```
+- Installs ISP tuning to `/var/nvidia/nvcam/settings/`
 
 Use Jetson-IO to configure the CSI connector:
 
@@ -214,6 +204,20 @@ echo 0 | sudo tee /sys/module/nv_ar0234/parameters/test_mode
 | 2 | 100% color bar |
 | 3 | Fade-to-grey color bar |
 | 256 | Walking 1s (10-bit) |
+
+## ISP tuning
+
+Tuning file carries ISP parameters for this sensor: black level, white balance and color correction. Lens shading is left disabled. Global `camera_overrides.isp` applies to every camera and would shadow it, so setup retires it to `camera_overrides.isp.bak`.
+
+Setup installs a file per badge, `kurokesu_front_234CSI.isp` and `kurokesu_rear_234CSI.isp`, so each camera on a dual board resolves its own.
+
+To restore default ISP parameters, remove tuning files and restart Argus:
+
+```bash
+sudo rm /var/nvidia/nvcam/settings/kurokesu_front_234CSI.isp
+sudo rm /var/nvidia/nvcam/settings/kurokesu_rear_234CSI.isp
+sudo systemctl restart nvargus-daemon
+```
 
 ## Development builds
 
