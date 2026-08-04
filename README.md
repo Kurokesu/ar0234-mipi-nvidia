@@ -71,7 +71,17 @@ After reboot, verify sensor is detected:
 sudo dmesg | grep ar0234
 ```
 
-![dmesg-ar0234](./docs/dmesg.png "dmesg-ar0234")
+Expected output (dual):
+
+```
+nv_ar0234: module verification failed: signature and/or required key missing - tainting kernel
+ar0234 9-0010: tegracam sensor driver:ar0234_v2.0.6
+tegra-camrtc-capture-vi tegra-capture-vi: subdev ar0234 9-0010 bound
+ar0234 10-0010: tegracam sensor driver:ar0234_v2.0.6
+tegra-camrtc-capture-vi tegra-capture-vi: subdev ar0234 10-0010 bound
+```
+
+*Signature warning is expected since DKMS modules are unsigned.*
 
 ## Image output
 
