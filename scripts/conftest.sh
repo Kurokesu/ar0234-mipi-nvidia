@@ -3,18 +3,21 @@
 # SPDX-FileCopyrightText: Copyright (c) 2023-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-FileCopyrightText: Copyright (c) 2026, UAB Kurokesu. All rights reserved.
 #
-# Minimal conftest.h generator for the nv_ar0234 driver.
+# Minimal conftest.h generator
 #
 # Follows the same compile-test approach as NVIDIA's OOT conftest system
 # (nvidia-oot/scripts/conftest/) but only runs the tests needed by this driver.
 #
 # Usage:
-#   ./scripts/conftest.sh [output_dir] [kernel_source_dir]
+#	./scripts/conftest.sh [output_dir] [kernel_source_dir]
 #
-# output_dir        defaults to ./include (relative to script's parent dir)
+# output_dir defaults to ./include (relative to script's parent dir)
 # kernel_source_dir defaults to /lib/modules/$(uname -r)/build
 
 set -e
+
+# Status line formatter (matches Makefile's PRINT)
+print() { printf '  %-7s %s\n' "$1" "$2"; }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DEFAULT_OUT="$(cd "$SCRIPT_DIR/.." && pwd)/include"
@@ -23,14 +26,14 @@ KERNEL_SRC="${2:-/lib/modules/$(uname -r)/build}"
 
 CC="${CC:-gcc}"
 
-# --- Build CFLAGS (derived from NVIDIA's conftest.sh build_cflags) ---
-
+# Build CFLAGS (derived from NVIDIA's conftest.sh build_cflags)
 ISYSTEM=$($CC -print-file-name=include 2>/dev/null)
 HEADERS="$KERNEL_SRC/include"
 ARCH="arm64"
 SOURCE_ARCH="$KERNEL_SRC/arch/$ARCH/include"
 
 CFLAGS="-O2 -D__KERNEL__"
+# shellcheck disable=SC2089
 CFLAGS="$CFLAGS -DKBUILD_BASENAME=\"#conftest\" -DKBUILD_MODNAME=\"#conftest\""
 CFLAGS="$CFLAGS -nostdinc -isystem $ISYSTEM"
 CFLAGS="$CFLAGS -Wno-implicit-function-declaration -Wno-strict-prototypes"
@@ -39,60 +42,58 @@ CFLAGS="$CFLAGS -I$HEADERS -I$HEADERS/uapi -I$HEADERS/generated/uapi"
 CFLAGS="$CFLAGS -I$SOURCE_ARCH -I$SOURCE_ARCH/uapi"
 CFLAGS="$CFLAGS -I$SOURCE_ARCH/generated -I$SOURCE_ARCH/generated/uapi"
 
-# --- Compile-test helpers (same logic as NVIDIA's compile_check_conftest) ---
-
+# Compile-test helpers (same logic as NVIDIA's compile_check_conftest)
 TMPFILE=$(mktemp /tmp/conftest_XXXXXX)
 RESULT=""
 
 compile_test() {
-    # $1 = test code, $2 = define name, $3 = category (types|functions)
-    CODE="$1"
-    DEF="$2"
-    CAT="$3"
+	# $1 = test code, $2 = define name, $3 = category (types|functions)
+	CODE="$1"
+	DEF="$2"
+	CAT="$3"
 
-    echo "$CODE" > "${TMPFILE}.c"
-    if $CC $CFLAGS -c "${TMPFILE}.c" -o "${TMPFILE}.o" > /dev/null 2>&1; then
-        # Compilation succeeded
-        if [ "$CAT" = "functions" ]; then
-            RESULT="$RESULT
+	echo "$CODE" > "${TMPFILE}.c"
+	# shellcheck disable=SC2086,SC2090
+	if $CC $CFLAGS -c "${TMPFILE}.c" -o "${TMPFILE}.o" > /dev/null 2>&1; then
+		# Compilation succeeded
+		if [ "$CAT" = "functions" ]; then
+			RESULT="$RESULT
 #undef ${DEF}"
-        else
-            RESULT="$RESULT
+		else
+			RESULT="$RESULT
 #define ${DEF} 1"
-        fi
-    else
-        # Compilation failed
-        if [ "$CAT" = "functions" ]; then
-            RESULT="$RESULT
+		fi
+	else
+		# Compilation failed
+		if [ "$CAT" = "functions" ]; then
+			RESULT="$RESULT
 #define ${DEF} 1"
-        else
-            RESULT="$RESULT
+		else
+			RESULT="$RESULT
 #undef ${DEF}"
-        fi
-    fi
-    rm -f "${TMPFILE}.c" "${TMPFILE}.o"
+		fi
+	fi
+	rm -f "${TMPFILE}.c" "${TMPFILE}.o"
 }
 
-# --- Run compile tests (extracted from NVIDIA's conftest.sh) ---
-
-echo "  CONFTEST: i2c_driver_struct_probe_without_i2c_device_id_arg"
+# Run compile tests (extracted from NVIDIA's conftest.sh)
+print CHECK "i2c_driver_struct_probe_without_i2c_device_id_arg"
 compile_test "
 #define _LINUX_EFI_H
 #include <linux/i2c.h>
 void conftest_i2c_driver_struct_probe_without_i2c_device_id_arg(struct i2c_driver *i2cd) {
-    i2cd->probe(NULL);
+	i2cd->probe(NULL);
 }" "NV_I2C_DRIVER_STRUCT_PROBE_WITHOUT_I2C_DEVICE_ID_ARG" "types"
 
-echo "  CONFTEST: i2c_driver_struct_remove_return_type_int"
+print CHECK "i2c_driver_struct_remove_return_type_int"
 compile_test "
 #define _LINUX_EFI_H
 #include <linux/i2c.h>
 int conftest_i2c_driver_struct_remove_return_type_int(struct i2c_driver *i2cd) {
-    return i2cd->remove(NULL);
+	return i2cd->remove(NULL);
 }" "NV_I2C_DRIVER_STRUCT_REMOVE_RETURN_TYPE_INT" "types"
 
-# --- Write output ---
-
+# Write output
 mkdir -p "$OUT_DIR/nvidia"
 cat > "$OUT_DIR/nvidia/conftest.h" << HEADER
 /* SPDX-License-Identifier: MIT */
@@ -113,4 +114,4 @@ $RESULT
 HEADER
 
 rm -f "$TMPFILE"
-echo "  Generated $OUT_DIR/nvidia/conftest.h"
+print WROTE "$OUT_DIR/nvidia/conftest.h"
