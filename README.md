@@ -56,9 +56,9 @@ Navigate through the menu:
 2. Configure for compatible hardware
 3. Select port configuration:
 
-    - **Camera AR0234-A** - cam0
-    - **Camera AR0234-C** - cam1
-    - **Camera AR0234 Dual** - cam0 + cam1
+    - `Camera AR0234-A` - cam0
+    - `Camera AR0234-C` - cam1
+    - `Camera AR0234 Dual` - cam0 + cam1
 
     ![Jetson-IO menu with Camera AR0234 Dual selected.](./docs/jetson-io-tool.png)
 
