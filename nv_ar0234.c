@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * nv_ar0234.c - ar0234 sensor driver
+ * ar0234 sensor driver
  *
  * Copyright (c) 2016-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
  * Copyright (c) 2026, UAB Kurokesu. All rights reserved.
@@ -164,6 +164,7 @@ static int ar0234_set_gain(struct tegracam_device *tc_dev, s64 val)
 
 	if (reg_coarse < 4) {
 		uint16_t gain_coarse = (1 << reg_coarse) * gain_factor;
+
 		reg_fine = (32 * (val - gain_coarse)) / val;
 	}
 
@@ -172,11 +173,10 @@ static int ar0234_set_gain(struct tegracam_device *tc_dev, s64 val)
 
 	reg_gain = (reg_coarse << 4) | (reg_fine & 0xF);
 
-	if (reg_gain < 0x36) {
+	if (reg_gain < 0x36)
 		mfr_30ba_val = AR0234_MFR_30BA_GAIN_BITS(6);
-	} else {
+	else
 		mfr_30ba_val = AR0234_MFR_30BA_GAIN_BITS(0);
-	}
 
 	if (priv->mfr_30ba_val != mfr_30ba_val) {
 		dev_dbg(s_data->dev, "%s: Update MFR_30BA val: 0x%x\n",
@@ -761,7 +761,7 @@ static int ar0234_probe(struct i2c_client *client,
 
 	priv->i2c_client = tc_dev->client = client;
 	tc_dev->dev = dev;
-	strncpy(tc_dev->name, "ar0234", sizeof(tc_dev->name));
+	strscpy(tc_dev->name, "ar0234", sizeof(tc_dev->name));
 	tc_dev->dev_regmap_config = &sensor_regmap_config;
 	tc_dev->sensor_ops = &ar0234_common_ops;
 	tc_dev->v4l2sd_internal_ops = &ar0234_subdev_internal_ops;

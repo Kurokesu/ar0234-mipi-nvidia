@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * ar0234_mode_tbls.h - ar0234 sensor driver
+ * ar0234 sensor driver
  *
  * Copyright (c) 2016-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
  * Copyright (c) 2026, UAB Kurokesu. All rights reserved.
