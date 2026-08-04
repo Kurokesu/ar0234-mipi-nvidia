@@ -115,7 +115,7 @@ nvgstcapture-1.0 --sensor-id 0
 
 ## Trigger modes
 
-AR0234 supports two external trigger modes. Both use `TRIG` pin on camera module as external signal input. `TRIG` is a **1.8V logic level** input wired directly to sensor. Trigger pulse only initiates capture, exposure time remains controlled by sensor's integration time register.
+AR0234 supports two external trigger modes. Both use `TRIG` pin on camera module as external signal input. `TRIG` is a **1.8 V logic level** input wired directly to sensor. Trigger pulse only initiates capture, exposure time remains controlled by sensor's integration time register.
 
 `TRIG` and `FLASH` signals are available on AUX connector:
 
@@ -133,14 +133,14 @@ AR0234 supports two external trigger modes. Both use `TRIG` pin on camera module
 
 Sensor stays in standby and waits for activity on `TRIG` pin. Exposure and readout happen sequentially: readout does not begin until exposure is complete. Two sub-modes are available:
 
-- **Pulsed**: each high pulse on `TRIG` pin captures a single frame (minimum pulse width 125 ns, 3 EXTCLK cycles at 24 MHz). Framerate is determined by pulse frequency.
-- **Automatic**: if `TRIG` signal stays high, sensor outputs frames continuously at configured framerate.
+- **Pulsed**: each high pulse on `TRIG` pin captures a single frame (minimum pulse width 125 ns, 3 EXTCLK cycles at 24 MHz). Frame rate is determined by pulse frequency.
+- **Automatic**: if `TRIG` signal stays high, sensor outputs frames continuously at configured frame rate.
 
 ```bash
 echo 1 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
 ```
 
-After enabling trigger mode start sensor stream via `v4l2`. Frames will arrive when there is signal on `TRIG`.
+After enabling trigger mode, start sensor stream via `v4l2`. Frames will arrive when there is signal on `TRIG`.
 
 ```bash
 v4l2-ctl -d /dev/video0 --set-ctrl override_capture_timeout_ms=-1 --stream-mmap --stream-count=1000 --stream-to=/dev/null
@@ -164,25 +164,25 @@ echo 0 | sudo tee /sys/module/nv_ar0234/parameters/trigger_mode
 
 ## Flash output
 
-AR0234 has a `FLASH` output pin (1.8V logic level) that goes HIGH during sensor exposure, useful for synchronizing external illumination such as strobes or LEDs.
+AR0234 has a `FLASH` output pin (1.8 V logic level) that goes HIGH during sensor exposure, useful for synchronizing external illumination such as strobes or LEDs.
 
 | Parameter | Type | Description |
 | --------- | ---- | ----------- |
 | flash | bool | Enable flash output on FLASH pin |
 | flash_delay | int | Signed delay (-127..127), negative = lead, positive = lag |
 
-To enable flash output:
+Enable flash output:
 
 ```bash
 echo Y | sudo tee /sys/module/nv_ar0234/parameters/flash
 ```
 
-The flash signal start can be shifted relative to exposure using `flash_delay`:
+Flash signal start can be shifted relative to exposure using `flash_delay`:
 
 - **Negative values** (lead): flash starts *before* exposure, extending total flash time
 - **Positive values** (lag): flash starts *after* exposure begins, shortening total flash time
 
-`flash_delay` accepts values in the range of -127 to 127, where each unit is approximately **6.8 µs** (2-lane).
+`flash_delay` accepts values from -127 to 127, where each unit is approximately **6.8 µs** (2-lane).
 
 ```bash
 # Flash starts ~68 µs before exposure (2-lane)
@@ -209,7 +209,7 @@ Enable test pattern:
 echo 2 | sudo tee /sys/module/nv_ar0234/parameters/test_mode
 ```
 
-Turn test pattern off:
+Disable test pattern:
 
 ```bash
 echo 0 | sudo tee /sys/module/nv_ar0234/parameters/test_mode
