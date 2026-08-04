@@ -55,7 +55,7 @@
 				 */
 				modules {
 					module0 {
-						badge = "kurokesu_front_234M12";
+						badge = "kurokesu_front_234CSI";
 						position = "front";
 						orientation = "0";
 						drivernode0 {
@@ -64,7 +64,7 @@
 						};
 					};
 					module1 {
-						badge = "kurokesu_rear_234M12";
+						badge = "kurokesu_rear_234CSI";
 						position = "rear";
 						orientation = "0";
 						drivernode0 {
