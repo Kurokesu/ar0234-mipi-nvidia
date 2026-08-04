@@ -107,7 +107,7 @@ gst-launch-1.0 -e \
       queue ! nvvidconv ! queue ! nveglglessink
 ```
 
-### NVIDIA sample camera capture application
+### nvgstcapture
 
 ```bash
 nvgstcapture-1.0 --sensor-id 0
