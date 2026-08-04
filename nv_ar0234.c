@@ -46,6 +46,9 @@ MODULE_DEVICE_TABLE(of, ar0234_of_match);
 
 static int test_mode;
 module_param(test_mode, int, 0644);
+MODULE_PARM_DESC(
+	test_mode,
+	"Test pattern: 0=off (default), 1=solid, 2=color-bar, 3=fade-to-grey, 256=walking-1s");
 
 static int trigger_mode;
 module_param(trigger_mode, int, 0644);
