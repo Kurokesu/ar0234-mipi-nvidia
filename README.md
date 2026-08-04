@@ -44,19 +44,21 @@ Setup script:
 - Builds and copies device tree overlay (`.dtbo`) to `/boot`
 - Installs ISP tuning to `/var/nvidia/nvcam/settings/`
 
-Use Jetson-IO to configure the CSI connector:
+Use Jetson-IO to configure CSI connector:
 
 ```bash
 sudo /opt/nvidia/jetson-io/jetson-io.py
 ```
 
 Navigate through the menu:
+
 1. Configure Jetson CSI Connector (named "22pin" on 6.2.2, "24pin" on 6.2.1)
 2. Configure for compatible hardware
 3. Select port configuration:
-   - **Camera AR0234-A** - cam0
-   - **Camera AR0234-C** - cam1
-   - **Camera AR0234 Dual** - cam0 + cam1
+
+    - **Camera AR0234-A** - cam0
+    - **Camera AR0234-C** - cam1
+    - **Camera AR0234 Dual** - cam0 + cam1
 
     ![Jetson-IO menu with Camera AR0234 Dual selected.](./docs/jetson-io-tool.png)
 
